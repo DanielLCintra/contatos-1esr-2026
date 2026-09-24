@@ -1,7 +1,8 @@
 'use client'
 import Link from "next/link"
+import { memo } from "react"
 
-const ContactItem = ({ contact, handleRemove, ...props }) => {
+const ContactItem = memo(({ contact, handleRemove, ...props }) => {
 
     return (
         <li {...props} className="p-4 flex items-center justify-between">
@@ -24,6 +25,6 @@ const ContactItem = ({ contact, handleRemove, ...props }) => {
             </button>
         </li>
     )
-}
+})
 
 export default ContactItem
