@@ -1,6 +1,7 @@
 // app/contact/[id]/page.js
 "use client";
 
+import contactsApi from '@/app/services/contactsApi';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -11,24 +12,39 @@ const ContactDetailPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Buscar contatos do localStorage
-        const savedContacts = localStorage.getItem('contatos');
-        if (savedContacts) {
-            const contacts = JSON.parse(savedContacts);
-            const foundContact = contacts.find(c => c.id === parseInt(params.id));
-
-            if (foundContact) {
-                setContact(foundContact);
-            } else {
-                // Contato não encontrado
-                router.push('/');
+        const loadContact = async () => {
+            try {
+                const response = await contactsApi.get(`/contatos/${params.id}`)
+                setContact(response.data)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+                setLoading(false)
             }
-        } else {
-            // Não há contatos salvos
-            router.push('/');
         }
-        setLoading(false);
-    }, [params.id, router]);
+
+        loadContact()
+    }, [])
+
+    // useEffect(() => {
+    //     // Buscar contatos do localStorage
+    //     const savedContacts = localStorage.getItem('contatos');
+    //     if (savedContacts) {
+    //         const contacts = JSON.parse(savedContacts);
+    //         const foundContact = contacts.find(c => c.id === parseInt(params.id));
+
+    //         if (foundContact) {
+    //             setContact(foundContact);
+    //         } else {
+    //             // Contato não encontrado
+    //             router.push('/');
+    //         }
+    //     } else {
+    //         // Não há contatos salvos
+    //         router.push('/');
+    //     }
+    //     setLoading(false);
+    // }, [params.id, router]);
 
     if (loading) {
         return (

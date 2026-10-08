@@ -1,9 +1,17 @@
+import contactsApi from "../services/contactsApi";
 import ContactItem from "./ContactItem";
 import EmptyState from "./ui/EmptyState";
 
 const ContactList = ({ contacts, setContacts }) => {
-    const handleRemove = (id) => {
-        setContacts((prev) => prev.filter((c) => c.id !== id));
+
+    const handleRemove = async (id) => {
+        try {
+            await contactsApi.delete(`/contatos/${id}`)
+            setContacts((prev) => prev.filter((c) => c.id !== id));
+        } catch (error) {
+            console.log(error)
+        }
+
     };
 
     return (<section className="bg-white shadow rounded">
