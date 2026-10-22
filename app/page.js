@@ -1,77 +1,16 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 import FilterInput from "./components/FilterInput";
 import Statistics from "./components/Statistics";
-import contactsApi from "./services/contactsApi";
+import { useContactsContext } from "./contexts/ContactsContext";
+import useFilter from "./hooks/useFilter";
+import useStatistics from "./hooks/useStatistics";
 
 const HomePage = () => {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState("")
-  const [isLoaded, setIsLoaded] = useState(false)
-
-  const filteredContacts = useMemo(() => {
-    console.log('Filtrando contatos...');
-
-    if (!filter.trim()) {
-      return contacts;
-    }
-
-    return contacts.filter(contact =>
-      contact.nome.toLowerCase().includes(filter.toLowerCase()) ||
-      contact.email.toLowerCase().includes(filter.toLowerCase()) ||
-      contact.telefone.includes(filter)
-    );
-  }, [contacts, filter]);
-
-  const handleSubmit = (newContact) => {
-    setContacts(prev => [...prev, newContact]);
-  };
-
-  // useEffect(() => {
-  //   const savedContacts = localStorage.getItem('contatos');
-  //   if (savedContacts) {
-  //     setContacts(JSON.parse(savedContacts));
-  //   }
-  //   setIsLoaded(true);
-  // }, []);
-
-  useEffect(() => {
-    const loadContacts = async () => {
-      try {
-        const response = await contactsApi.get('/contatos')
-        setContacts(response.data)
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    loadContacts()
-  }, []);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('contatos', JSON.stringify(contacts));
-    }
-  }, [contacts, isLoaded]);
-
-  const stats = useMemo(() => {
-    console.log('Calculando estatísticas...');
-
-    const total = contacts.length;
-    const comEmail = contacts.filter(c => c.email).length;
-    const comTelefone = contacts.filter(c => c.telefone).length;
-
-    return {
-      total,
-      comEmail,
-      comTelefone,
-      semEmail: total - comEmail,
-      semTelefone: total - comTelefone
-    };
-  }, [contacts]);
-
+  const contactsData = useContactsContext()
+  const filterData = useFilter(contactsData.contacts)
+  const stats = useStatistics(contactsData.contacts)
 
   return (
     <div className="min-h-screen bg-gray-200 p-6">
@@ -81,16 +20,16 @@ const HomePage = () => {
             Cadastro de Contatos
           </h1>
 
-          <FilterInput value={filter} onChange={setFilter} />
+          <FilterInput value={filterData.filter} onChange={filterData.handleFilterChange} />
         </header>
 
         {/* ===== FORMULÁRIO ===== */}
-        <ContactForm setContacts={setContacts} />
+        <ContactForm setContacts={contactsData.setContacts} />
 
         <Statistics stats={stats} />
 
         {/* ===== LISTA DE CONTATOS ===== */}
-        <ContactList contacts={filteredContacts} setContacts={setContacts} />
+        <ContactList contacts={filterData.filteredContacts} setContacts={contactsData.setContacts} />
       </div>
     </div>
   );

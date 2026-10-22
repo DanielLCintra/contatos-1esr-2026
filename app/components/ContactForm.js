@@ -21,21 +21,6 @@ const ContactForm = ({ setContacts }) => {
         return newErrors;
     };
 
-    // const handleSubmit = useCallback((e) => {
-    //     e.preventDefault();
-
-    //     const newErrors = validate()
-
-    //     if (Object.keys(newErrors).length > 0) {
-    //         setErrors(newErrors);
-    //         return;
-    //     }
-
-    //     setContacts((prev) => [...prev, { ...form, id: Date.now() }]);
-    //     setForm({ nome: "", email: "", telefone: "" });
-    //     nomeInputRef.current.focus()
-    // }, []);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
